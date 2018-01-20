@@ -39,14 +39,21 @@
     MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
     TERMS.
 */
-
+#include <stdint.h>
 #include "mcc_generated_files/mcc.h"
+
+uint8_t BME280_Read(uint8_t reg, uint8_t *pData);
+
+#define BME280_ADDRESS  0x76   // slave device address
+#define BME280_ADDR_ID  0xD0
 
 /*
                          Main application
  */
 void main(void)
 {
+    uint8_t data;
+    
     // initialize the device
     SYSTEM_Initialize();
 
@@ -54,10 +61,10 @@ void main(void)
     // Use the following macros to:
 
     // Enable the Global Interrupts
-    //INTERRUPT_GlobalInterruptEnable();
+    INTERRUPT_GlobalInterruptEnable();
 
     // Enable the Peripheral Interrupts
-    //INTERRUPT_PeripheralInterruptEnable();
+    INTERRUPT_PeripheralInterruptEnable();
 
     // Disable the Global Interrupts
     //INTERRUPT_GlobalInterruptDisable();
@@ -65,19 +72,42 @@ void main(void)
     // Disable the Peripheral Interrupts
     //INTERRUPT_PeripheralInterruptDisable();
 
-/*    
-    D4_LAT=0b1;
-    D5_LAT=0b1;
+    
+//    D4_LAT=0b1;
+//    D5_LAT=0b1;
     D6_LAT=0b1;
-    D7_LAT=0b1;
-*/
+//    D7_LAT=0b1;
+
     printf("BME280 PIC start!\r\n");
+    
+    BME280_Read(0xD0,&data);
+    printf("BME280 ID:0x%02x\r\n",data);
+
+    
     
     while (1)
     {
         // Add your application code
+        __delay_ms(500);
+        D4_Toggle();
+        
     }
 }
+
+uint8_t BME280_Read(uint8_t reg, uint8_t *pData)
+{
+    I2C1_MESSAGE_STATUS status = I2C1_MESSAGE_PENDING;
+    static I2C1_TRANSACTION_REQUEST_BLOCK trb[2];
+ 
+    I2C1_MasterWriteTRBBuild(&trb[0], &reg, 1, BME280_ADDRESS);
+    I2C1_MasterReadTRBBuild(&trb[1], pData, 1, BME280_ADDRESS);                
+    I2C1_MasterTRBInsert(2, &trb[0], &status);
+ 
+    while(status == I2C1_MESSAGE_PENDING);      // blocking
+ 
+    return (status == I2C1_MESSAGE_COMPLETE); 
+}
+
 /**
  End of File
 */

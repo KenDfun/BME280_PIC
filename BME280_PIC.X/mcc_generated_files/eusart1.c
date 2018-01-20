@@ -8,12 +8,12 @@
     eusart1.c
 
   @Summary
-    This is the generated driver implementation file for the EUSART1 driver using Foundation Services Library
+    This is the generated driver implementation file for the EUSART1 driver using PIC10 / PIC12 / PIC16 / PIC18 MCUs 
 
   @Description
     This header file provides implementations for driver APIs for EUSART1.
     Generation Information :
-        Product Revision  :  Foundation Services Library - 0.1.23
+        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs  - 1.45
         Device            :  PIC16F15344
         Driver Version    :  2.00
     The generated drivers are tested against the following:
@@ -73,21 +73,6 @@ void EUSART1_Initialize(void)
 
 }
 
-
-bool EUSART1_is_tx_ready(void)
-{
-    return (PIR3bits.TX1IF && TX1STAbits.TXEN);
-}
-
-bool EUSART1_is_rx_ready(void)
-{
-    return PIR3bits.RC1IF;
-}
-
-bool EUSART1_is_tx_done(void)
-{
-    return TX1STAbits.TRMT;
-}
 
 uint8_t EUSART1_Read(void)
 {

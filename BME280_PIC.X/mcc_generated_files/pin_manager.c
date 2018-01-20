@@ -13,7 +13,7 @@
   Description:
     This header file provides implementations for pin APIs for all pins selected in the GUI.
     Generation Information :
-        Product Revision  :  MPLAB(c) Code Configurator - 4.35
+        Product Revision  :  MPLAB(c) Code Configurator - 4.26.1
         Device            :  PIC16F15344
         Driver Version    :  1.02
     The generated drivers are tested against the following:
@@ -63,14 +63,14 @@ void PIN_MANAGER_Initialize(void)
     */    
     TRISA = 0x19;
     TRISB = 0x70;
-    TRISC = 0xDF;
+    TRISC = 0xDD;
 
     /**
     ANSELx registers
     */   
-    ANSELC = 0xDF;
-    ANSELB = 0x50;
-    ANSELA = 0x11;
+    ANSELC = 0x0D;
+    ANSELB = 0x0F;
+    ANSELA = 0x19;
 
     /**
     WPUx registers
@@ -91,9 +91,24 @@ void PIN_MANAGER_Initialize(void)
    
     
     
-    RX1DTPPSbits.RX1DTPPS = 0x0D;   //RB5->EUSART1:RX1;
-    RB7PPS = 0x0F;   //RB7->EUSART1:TX1;
+    bool state = (unsigned char)GIE;
+    GIE = 0;
+    PPSLOCK = 0x55;
+    PPSLOCK = 0xAA;
+    PPSLOCKbits.PPSLOCKED = 0x00; // unlock PPS
 
+    SSP1DATPPSbits.SSP1DATPPS = 0x0C;   //RB4->MSSP1:SDA1;
+    SSP1CLKPPSbits.SSP1CLKPPS = 0x0E;   //RB6->MSSP1:SCL1;
+    RB6PPS = 0x15;   //RB6->MSSP1:SCL1;
+    RB7PPS = 0x0F;   //RB7->EUSART1:TX1;
+    RB4PPS = 0x16;   //RB4->MSSP1:SDA1;
+    RX1DTPPSbits.RX1DTPPS = 0x0D;   //RB5->EUSART1:RX1;
+
+    PPSLOCK = 0x55;
+    PPSLOCK = 0xAA;
+    PPSLOCKbits.PPSLOCKED = 0x01; // lock PPS
+
+    GIE = state;
 }       
 
 void PIN_MANAGER_IOC(void)

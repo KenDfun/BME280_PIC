@@ -1,5 +1,5 @@
 /**
-  @Generated PIC10 / PIC12 / PIC16 / PIC18 MCUs Source File
+  @Generated PIC10 / PIC12 / PIC16 / PIC18 MCUs  Source File
 
   @Company:
     Microchip Technology Inc.
@@ -8,17 +8,17 @@
     mcc.c
 
   @Summary:
-    This is the mcc.c file generated using PIC10 / PIC12 / PIC16 / PIC18 MCUs
+    This is the mcc.c file generated using PIC10 / PIC12 / PIC16 / PIC18 MCUs 
 
   @Description:
     This header file provides implementations for driver APIs for all modules selected in the GUI.
     Generation Information :
-        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs - 1.65
+        Product Revision  :  PIC10 / PIC12 / PIC16 / PIC18 MCUs  - 1.45
         Device            :  PIC16F15344
-        Driver Version    :  2.00
+        Driver Version    :  1.02
     The generated drivers are tested against the following:
-        Compiler          :  XC8 1.45 or later
-        MPLAB             :  MPLAB X 4.10
+        Compiler          :  XC8 1.35
+        MPLAB             :  MPLAB X 3.40
 */
 
 /*
@@ -41,13 +41,13 @@
 
     MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE
     TERMS.
-*/ 
+*/
 
 // Configuration bits: selected in the GUI
 
 // CONFIG1
 #pragma config FEXTOSC = OFF    // External Oscillator mode selection bits->Oscillator not enabled
-#pragma config RSTOSC = HFINT1    // Power-up default value for COSC bits->HFINTOSC (1MHz)
+#pragma config RSTOSC = HFINT32    // Power-up default value for COSC bits->HFINTOSC with OSCFRQ= 32 MHz and CDIV = 1:1
 #pragma config CLKOUTEN = OFF    // Clock Out Enable bit->CLKOUT function is disabled; i/o or oscillator function on OSC2
 #pragma config CSWEN = ON    // Clock Switch Enable bit->Writing to NOSC and NDIV is allowed
 #pragma config FCMEN = ON    // Fail-Safe Clock Monitor Enable bit->FSCM timer enabled
@@ -83,12 +83,13 @@
 
 #include "mcc.h"
 
-
 void SYSTEM_Initialize(void)
 {
-    PMD_Initialize();
+
     PIN_MANAGER_Initialize();
     OSCILLATOR_Initialize();
+    I2C1_Initialize();
+    ADC_Initialize();
     EUSART1_Initialize();
 }
 
@@ -104,24 +105,8 @@ void OSCILLATOR_Initialize(void)
     OSCFRQ = 0x06;
     // MFOR not ready; 
     OSCSTAT = 0x00;
-    // HFTUN 32; 
-    OSCTUNE = 0x20;
-}
-
-void PMD_Initialize(void)
-{
-    // CLKRMD CLKR enabled; SYSCMD SYSCLK enabled; FVRMD FVR enabled; IOCMD IOC enabled; NVMMD NVM enabled; 
-    PMD0 = 0x00;
-    // TMR0MD TMR0 enabled; TMR1MD TMR1 enabled; TMR2MD TMR2 enabled; NCOMD DDS(NCO) enabled; 
-    PMD1 = 0x00;
-    // ZCDMD ZCD enabled; CMP1MD CMP1 enabled; ADCMD ADC enabled; CMP2MD CMP2 enabled; DAC1MD DAC1 enabled; 
-    PMD2 = 0x00;
-    // CCP2MD CCP2 enabled; CCP1MD CCP1 enabled; PWM4MD PWM4 enabled; PWM3MD PWM3 enabled; PWM6MD PWM6 enabled; PWM5MD PWM5 enabled; 
-    PMD3 = 0x00;
-    // CWG1MD CWG1 enabled; UART2MD EUSART2 enabled; MSSP1MD MSSP1 enabled; UART1MD EUSART enabled; 
-    PMD4 = 0x00;
-    // CLC3MD CLC3 enabled; CLC4MD CLC4 enabled; CLC1MD CLC1 enabled; CLC2MD CLC2 enabled; 
-    PMD5 = 0x00;
+    // HFTUN 0; 
+    OSCTUNE = 0x00;
 }
 
 
