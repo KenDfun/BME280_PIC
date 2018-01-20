@@ -89,6 +89,7 @@ void SYSTEM_Initialize(void)
     PMD_Initialize();
     PIN_MANAGER_Initialize();
     OSCILLATOR_Initialize();
+    EUSART1_Initialize();
 }
 
 void OSCILLATOR_Initialize(void)

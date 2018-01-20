@@ -71,6 +71,7 @@ void main(void)
     D6_LAT=0b1;
     D7_LAT=0b1;
 */
+    printf("BME280 PIC start!\r\n");
     
     while (1)
     {
