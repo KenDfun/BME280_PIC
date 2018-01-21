@@ -98,9 +98,7 @@ void main(void)
     //    D7_LAT=0b1;
     __delay_ms(3000); // for debugger reset
     
-    
-    
-    printf("\r\n\r\n\r\nBME280 PIC start!\r\n");
+//    printf("\r\n\r\n\r\nBME280 PIC start!\r\n");
     
     get_ID();
     soft_reset();
@@ -109,34 +107,32 @@ void main(void)
     /* Recommended mode of operation: Indoor navigation */
     Settings.osr_h = BME280_OVERSAMPLING_1X;
     Settings.osr_p = BME280_OVERSAMPLING_16X;
-    Settings.osr_t = BME280_OVERSAMPLING_2X;
-    Settings.filter = BME280_FILTER_COEFF_16;
-    Settings.standby_time = BME280_STANDBY_TIME_62_5_MS;
+    Settings.osr_t = BME280_OVERSAMPLING_16X;
+//    Settings.filter = BME280_FILTER_COEFF_16;
+    Settings.filter = BME280_FILTER_COEFF_OFF;
+//    Settings.standby_time = BME280_STANDBY_TIME_62_5_MS;
+    Settings.standby_time = BME280_STANDBY_TIME_1_MS;
     set_sensor_setting(&Settings);
-    
+    set_sensor_mode(BME280_NORMAL_MODE);
     
     D7_LAT=0b1;    
     
-
-        
     while (1)
     {
         // Add your application code
-        set_sensor_mode(BME280_FORCED_MODE);
+//        set_sensor_mode(BME280_FORCED_MODE);
         __delay_ms(40);
         get_sensor_data(&SensorData,&SensorUncompData);
-        printf("%ld, %ld, %ld\r\n",SensorData.temperature, SensorData.pressure, SensorData.humidity);
-//        print_sensor_data();
+        printf("%ld, %ld, %ld             \r",SensorData.temperature, SensorData.pressure, SensorData.humidity);
         D4_Toggle();
-//        while(1);
-         __delay_ms(3000);        
+        __delay_ms(2000);        
     }
 }
 
 void get_ID(void)
 {
     user_i2c_read(BME280_ADDRESS,BME280_CHIP_ID_ADDR,&WorkRegData,1);
-    printf("BME280 ID:0x%02x\r\n",WorkRegData[0]);    
+//    printf("BME280 ID:0x%02x\r\n",WorkRegData[0]);    
 }
 
 void soft_reset(void)
@@ -273,20 +269,20 @@ void parse_sensor_data(const uint8_t *reg_data, BME280_UNCOMP_DATA *uncomp_data)
 	data_lsb = (uint32_t)reg_data[1] << 4;
 	data_xlsb = (uint32_t)reg_data[2] >> 4;
 	uncomp_data->pressure = data_msb | data_lsb | data_xlsb;
-    printf("Pressure uncomp: 0x%08lx\r\n",uncomp_data->pressure);
+//    printf("Pressure uncomp: 0x%08lx\r\n",uncomp_data->pressure);
 
 	/* Store the parsed register values for temperature data */
 	data_msb = (uint32_t)reg_data[3] << 12;
 	data_lsb = (uint32_t)reg_data[4] << 4;
 	data_xlsb = (uint32_t)reg_data[5] >> 4;
 	uncomp_data->temperature = data_msb | data_lsb | data_xlsb;
-    printf("Temperature uncomp: 0x%08lx\r\n",uncomp_data->temperature);
+//    printf("Temperature uncomp: 0x%08lx\r\n",uncomp_data->temperature);
 	
     /* Store the parsed register values for temperature data */
 	data_lsb = (uint32_t)reg_data[6] << 8;
 	data_msb = (uint32_t)reg_data[7];
 	uncomp_data->humidity = data_msb | data_lsb;
-    printf("Humidity uncomp: 0x%08lx\r\n",uncomp_data->humidity);
+//    printf("Humidity uncomp: 0x%08lx\r\n",uncomp_data->humidity);
 }
 
 static int32_t compensate_temperature(const BME280_UNCOMP_DATA *uncomp_data,	BME280_CALIB_DATA *calib_data);
