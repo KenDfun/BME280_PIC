@@ -47,9 +47,9 @@
 #include "bme280_mac.h"
 
 //uint8_t BME280_Read(uint8_t reg, uint8_t *pData);
-int8_t user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
-int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
-void user_delay_ms(uint32_t period);
+I2C1_MESSAGE_STATUS user_i2c_read(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
+I2C1_MESSAGE_STATUS user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint16_t len);
+//void user_delay_ms(uint32_t period);
 
 
 void get_ID(void);
@@ -123,7 +123,7 @@ void main(void)
     {
         // Add your application code
         set_sensor_mode(BME280_FORCED_MODE);
-        user_delay_ms(40);
+        __delay_ms(40);
         get_sensor_data(&SensorData,&SensorUncompData);
         printf("%ld, %ld, %ld\r\n",SensorData.temperature, SensorData.pressure, SensorData.humidity);
 //        print_sensor_data();
@@ -144,9 +144,9 @@ void soft_reset(void)
     uint8_t soft_rst_cmd = 0xB6;
     
     user_i2c_write(BME280_ADDRESS,BME280_RESET_ADDR,&soft_rst_cmd,1);
-    user_delay_ms(2);
+    __delay_ms(2);
     
-    printf("Soft Reset!\r\n");
+//    printf("Soft Reset!\r\n");
 }
 
 static void parse_temp_press_calib_data(BME280_CALIB_DATA *calib_data, const uint8_t *reg_data);
@@ -154,11 +154,11 @@ static void parse_humidity_calib_data(BME280_CALIB_DATA *calib_data, const uint8
 
 void get_calib_data(BME280_CALIB_DATA *cal_data)
 {
-    printf("Get Temp Press Calib data\r\n");
+//    printf("Get Temp Press Calib data\r\n");
     user_i2c_read(BME280_ADDRESS,BME280_TEMP_PRESS_CALIB_DATA_ADDR,&WorkRegData,BME280_TEMP_PRESS_CALIB_DATA_LEN);
     parse_temp_press_calib_data(cal_data,WorkRegData);
     
-    printf("Get Humidity Calib data\r\n");
+//    printf("Get Humidity Calib data\r\n");
     user_i2c_read(BME280_ADDRESS,BME280_HUMIDITY_CALIB_DATA_ADDR,&WorkRegData,BME280_HUMIDITY_CALIB_DATA_LEN);
     parse_humidity_calib_data(cal_data,WorkRegData);
 }
@@ -168,7 +168,7 @@ void set_filter_standby_settings(BME280_SETTINGS *settings);
 
 void set_sensor_setting(BME280_SETTINGS *settings)
 {
-    printf("Sensor Setting\r\n");
+//    printf("Sensor Setting\r\n");
     
     /* if mode is not sleep mode then soft rest. */
     sensor_sleep_check();
@@ -180,7 +180,7 @@ void set_sensor_setting(BME280_SETTINGS *settings)
 void set_osr_settings(BME280_SETTINGS *settings)
 {   
 	/* Write the humidity control value in the register */
-    printf("Humidity control value write: 0x%02d\r\n",settings->osr_h);
+//    printf("Humidity control value write: 0x%02d\r\n",settings->osr_h);
     WorkRegData[0] = settings->osr_h & BME280_CTRL_HUM_MSK;
     user_i2c_write(BME280_ADDRESS,BME280_CTRL_HUM_ADDR, &WorkRegData, 1);
     
@@ -191,7 +191,7 @@ void set_osr_settings(BME280_SETTINGS *settings)
     user_i2c_write(BME280_ADDRESS,BME280_CTRL_MEAS_ADDR, &WorkRegData, 1);
 #endif
     
-    printf("MEAS control value write: PRESS 0x%0d, TEMP 0x%02d\r\n",settings->osr_p,settings->osr_t);
+//    printf("MEAS control value write: PRESS 0x%0d, TEMP 0x%02d\r\n",settings->osr_p,settings->osr_t);
     user_i2c_read(BME280_ADDRESS,BME280_CTRL_MEAS_ADDR, &WorkRegData, 1);
 //    BME280_SET_BITS(WorkRegData[0], BME280_CTRL_PRESS, settings->osr_p);
     WorkRegData[0] = (WorkRegData[0] & (~BME280_CTRL_PRESS_MSK)) | ((settings->osr_p << BME280_CTRL_PRESS_POS) & BME280_CTRL_PRESS_MSK);
@@ -202,7 +202,7 @@ void set_osr_settings(BME280_SETTINGS *settings)
 
 void set_filter_standby_settings(BME280_SETTINGS *settings)
 {
-    printf("Config control value write: FILTER 0x%02d, STANBY 0x%02d\r\n",settings->filter,settings->standby_time);
+//    printf("Config control value write: FILTER 0x%02d, STANBY 0x%02d\r\n",settings->filter,settings->standby_time);
     user_i2c_read(BME280_ADDRESS,BME280_CONFIG_ADDR, &WorkRegData, 1);
 //    BME280_SET_BITS(WorkRegData[0], BME280_FILTER, settings->filter);
     WorkRegData[0] = (WorkRegData[0] & (~BME280_FILTER_MSK)) | ((settings->filter << BME280_FILTER_POS) & BME280_FILTER_MSK);
@@ -213,7 +213,7 @@ void set_filter_standby_settings(BME280_SETTINGS *settings)
 
 void set_sensor_mode(uint8_t sensor_mode)
 {
-    printf("Set sensor mode: 0x%02x\r\n",sensor_mode);
+//    printf("Set sensor mode: 0x%02x\r\n",sensor_mode);
     
     /* if mode is not sleep mode then soft rest. */
     sensor_sleep_check();
@@ -303,12 +303,12 @@ void compensate_data(const BME280_UNCOMP_DATA *uncomp_data, BME280_DATA *comp_da
         /* Compensate the temperature data */
         comp_data->temperature = compensate_temperature(uncomp_data, calib_data);
         /* Compensate the pressure data */
-//        comp_data->pressure = compensate_pressure(uncomp_data, calib_data);
+        comp_data->pressure = compensate_pressure(uncomp_data, calib_data);
         /* Compensate the humidity data */
-//        comp_data->humidity = compensate_humidity(uncomp_data, calib_data);
+        comp_data->humidity = compensate_humidity(uncomp_data, calib_data);
 	}
     else {
-		printf("Have Bug in this program!!!!\r\n");
+//		printf("Have Bug in this program!!!!\r\n");
 	}
 }
 
@@ -325,6 +325,65 @@ static int32_t compensate_temperature(const BME280_UNCOMP_DATA *uncomp_data,	BME
     return temperature;
 }
 
+static uint32_t compensate_pressure(const BME280_UNCOMP_DATA *uncomp_data, const BME280_CALIB_DATA *calib_data)
+{
+    int32_t var1;
+	int32_t var2;
+	uint32_t pressure;
+    
+    var1 = (((int32_t)calib_data->t_fine) >> 1) - (int32_t)64000;
+    var2 = (((var1 >> 2) * (var1 >> 2)) >> 11) * ((int32_t)calib_data->dig_P6);
+    var2 = var2 + ((var1 * ((int32_t)calib_data->dig_P5)) << 1);
+    var2 = (var2 >> 2) + (((int32_t)calib_data->dig_P4) << 16);
+    var1 = (((calib_data->dig_P3 * (((var1 >> 2) * (var1 >> 2)) >> 13)) >> 3) + ((((int32_t)calib_data->dig_P2) * var1) >> 1)) >> 18;
+    var1 = (((32768 + var1)) * ((int32_t)calib_data->dig_P1)) >> 15;
+    
+    if(var1 == 0){
+        return 0;
+    }
+    
+    pressure = ((uint32_t)((((uint32_t)1048576) - uncomp_data->pressure) - (uint32_t)(var2 >> 12))) * 3125;
+    if (pressure < 0x80000000){
+        pressure = (pressure << 1) / ((uint32_t)var1);
+    }
+    else{
+			pressure = (pressure / (uint32_t)var1) << 1;      
+    }
+    
+    var1 = (((int32_t)calib_data->dig_P9) * ((int32_t)(((pressure >> 3) * (pressure >> 3)) >> 13))) >> 12;
+    var2 = (((int32_t)(pressure >> 2)) * ((int32_t)calib_data->dig_P8)) >> 13;
+    pressure = (uint32_t)((int32_t)pressure + ((var1 + var2 + calib_data->dig_P7) >> 4));    
+
+    return pressure;
+}
+static uint32_t compensate_humidity(const BME280_UNCOMP_DATA *uncomp_data,	const BME280_CALIB_DATA *calib_data)
+{
+	int32_t var1;
+	int32_t var2;
+	int32_t var3;
+	int32_t var4;
+	int32_t var5;
+	uint32_t humidity;
+
+
+	var1 = calib_data->t_fine - ((int32_t)76800);
+	var2 = (int32_t)(uncomp_data->humidity << 14);
+	var3 = (int32_t)(((int32_t)calib_data->dig_H4) << 20);
+	var4 = ((int32_t)calib_data->dig_H5) * var1;
+	var5 = (((var2 - var3) - var4) + (int32_t)16384) >> 15;
+	var2 = (var1 * ((int32_t)calib_data->dig_H6)) >> 10;
+	var3 = (var1 * ((int32_t)calib_data->dig_H3)) >> 11;
+	var4 = ((var2 * (var3 + (int32_t)32768)) >> 10) + (int32_t)2097152;
+	var2 = ((var4 * ((int32_t)calib_data->dig_H2)) + 8192) >> 14;
+	var3 = var5 * var2;
+	var4 = ((var3 >> 15) * (var3 >> 15)) >> 7;
+	var5 = var3 - ((var4 * ((int32_t)calib_data->dig_H1)) >> 4);
+	var5 = (var5 < 0 ? 0 : var5);
+	var5 = (var5 > 419430400 ? 419430400 : var5);
+	humidity = (uint32_t)(var5 >> 12);
+
+	return humidity;
+}
 #if 0
 static int32_t compensate_temperature(const BME280_UNCOMP_DATA *uncomp_data,	BME280_CALIB_DATA *calib_data)
 {
@@ -443,7 +502,7 @@ void compensate_data(const BME280_UNCOMP_DATA *uncomp_data, BME280_DATA *comp_da
 
 void get_sensor_data(BME280_DATA *sensor_data,BME280_UNCOMP_DATA *sensor_uncomp_data)
 {
-    printf("get sensor data\r\n");
+//    printf("get sensor data\r\n");
     user_i2c_read(BME280_ADDRESS,BME280_DATA_ADDR, &WorkRegData, BME280_P_T_H_DATA_LEN);    
     parse_sensor_data(&WorkRegData,sensor_uncomp_data);
     compensate_data(sensor_uncomp_data, sensor_data, &CalibData);
@@ -453,7 +512,7 @@ void get_sensor_mode(uint8_t *psensor_mode)
 {
     user_i2c_read(BME280_ADDRESS,BME280_CTRL_MEAS_ADDR, &WorkRegData, 1);
     *psensor_mode = WorkRegData[0]  & BME280_SENSOR_MODE_MSK;
-    printf("Get Sensor Mode: 0x%02x\r\n",*psensor_mode);
+//    printf("Get Sensor Mode: 0x%02x\r\n",*psensor_mode);
 }
 
 void get_sensor_mode(uint8_t *psensor_mode);
@@ -462,7 +521,7 @@ void sensor_sleep_check(void)
 {
     uint8_t mode;
     
-    printf("Sleep Check\r\n");
+//    printf("Sleep Check\r\n");
     get_sensor_mode(&mode);
     if(mode !=BME280_SLEEP_MODE){
         soft_reset();
@@ -475,13 +534,9 @@ void sensor_sleep_check(void)
 
 static I2C1_TRANSACTION_REQUEST_BLOCK Trb[2];
 
-int8_t user_i2c_read(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
+I2C1_MESSAGE_STATUS user_i2c_read(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
 {
-    int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
     I2C1_MESSAGE_STATUS status = I2C1_MESSAGE_PENDING;
-
-    
-    int i;
     
     /*
      * The parameter dev_id can be used as a variable to store the I2C address of the device
@@ -504,18 +559,22 @@ int8_t user_i2c_read(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *reg_data, uint
      */
     
   
-    
+#ifdef I2C_DEBUG
     if(len>26){
         printf("I2C len over\r\n");
         return -1;
     }
+#endif
     
     I2C1_MasterWriteTRBBuild(&Trb[0], &reg_addr, 1, i2c_addr); /* write to read for subaddr */
     I2C1_MasterReadTRBBuild(&Trb[1], reg_data, len, i2c_addr); /* read a number of len of data */
     I2C1_MasterTRBInsert(2, &Trb[0], &status); /* transaction start */
     
     while(status == I2C1_MESSAGE_PENDING);      // blocking
-    
+  
+#ifdef I2C_DEBUG
+    {
+    int i;
     printf("I2C read : ADDR 0x%02x, SUBADDR 0x%02x\r\n",i2c_addr,reg_addr);
     for(i=0;i<len;i++){
         printf("0x%02x ",reg_data[i]);
@@ -528,21 +587,19 @@ int8_t user_i2c_read(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *reg_data, uint
         printf("\r\n"); 
     }
     printf("Result: 0x%02x\r\n\r\n",status);
-
+    }
+#endif
     
-    rslt = status;
     
-    return rslt;
+    return status;
 }
 
 
 
-int8_t user_i2c_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
+I2C1_MESSAGE_STATUS user_i2c_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *reg_data, uint16_t len)
 {
-    int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
     I2C1_MESSAGE_STATUS status = I2C1_MESSAGE_PENDING;
     static uint8_t workreg[BME280_TEMP_PRESS_CALIB_DATA_LEN+1];
-    int i;
     
     /*
      * The parameter dev_id can be used as a variable to store the I2C address of the device
@@ -570,8 +627,9 @@ int8_t user_i2c_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *reg_data, uin
     
     while(status == I2C1_MESSAGE_PENDING);      // blocking
     
-    rslt = status;
-    
+#ifdef I2C_DEBUG    
+    {
+    int i;
     printf("I2C write : ADDR 0x%02x, SUBADDR 0x%02x\r\n",i2c_addr,reg_addr);
     for(i=0;i<len;i++){
         printf("0x%02x ",reg_data[i]);
@@ -583,10 +641,13 @@ int8_t user_i2c_write(uint8_t i2c_addr, uint8_t reg_addr, uint8_t *reg_data, uin
         printf("\r\n"); 
     }
     printf("Result: 0x%02x\r\n\r\n",status);
+    }
+#endif
     
-    return rslt;
+    return status;
 }
 
+#if 0
 void user_delay_ms(uint32_t period)
 {
     /*
@@ -597,6 +658,7 @@ void user_delay_ms(uint32_t period)
     
     return;
 }
+#endif
 
 #if 0
 
