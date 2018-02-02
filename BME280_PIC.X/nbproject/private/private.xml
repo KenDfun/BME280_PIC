@@ -3,12 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/mcc_generated_files/mcc.c</file>
             <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/main.c</file>
             <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/mcc_generated_files/i2c1.h</file>
-            <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/mcc_generated_files/pin_manager.h</file>
-            <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/mcc_generated_files/interrupt_manager.c</file>
+            <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/BME280_driver/bme280.h</file>
+            <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/BME280_driver/bme280_defs.h</file>
+            <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/BME280_driver/bme280.c</file>
+            <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/nbproject/Makefile-default.mk</file>
             <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/mcc_generated_files/i2c1.c</file>
+            <file>file:/D:/src/Micon/BME280/BME280_PIC/BME280_PIC.X/bme280_mac.h</file>
         </group>
     </open-files>
 </project-private>
